@@ -1,11 +1,13 @@
 package com.ttdat.springbootjwt.filter;
 
-import com.ttdat.springbootjwt.service.JwtService;
+import com.ttdat.springbootjwt.util.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,17 +15,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Component
 @RequiredArgsConstructor
-public class JWTAuthFilter extends OncePerRequestFilter {
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -37,10 +37,10 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authHeader != null && authHeader.startsWith("Bearer ")){
             jwt = authHeader.substring(7);
-            userEmail = jwtService.extractUsername(jwt);
+            userEmail = JwtUtils.extractUsername(jwt);
             if(userEmail != null && authentication == null){
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                if(jwtService.isTokenValid(jwt, userDetails)){
+                if(JwtUtils.isTokenValid(jwt, userDetails)){
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
                             null,
