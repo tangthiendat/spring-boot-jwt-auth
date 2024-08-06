@@ -3,10 +3,12 @@ package com.ttdat.springbootjwt.service;
 import com.ttdat.springbootjwt.dto.request.AuthenticationRequest;
 import com.ttdat.springbootjwt.dto.request.RegisterRequest;
 import com.ttdat.springbootjwt.dto.response.AuthenticationResponse;
+import com.ttdat.springbootjwt.dto.response.RegisterResponse;
 import com.ttdat.springbootjwt.entity.Role;
 import com.ttdat.springbootjwt.entity.User;
+import com.ttdat.springbootjwt.mapper.UserMapper;
+import com.ttdat.springbootjwt.repository.RoleRepository;
 import com.ttdat.springbootjwt.repository.UserRepository;
-import com.ttdat.springbootjwt.util.JwtUtils;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,20 +25,19 @@ import java.util.Set;
 public class AuthenticationService {
 
     UserRepository userRepository;
+    RoleRepository roleRepository;
     PasswordEncoder passwordEncoder;
     AuthenticationManager authenticationManager;
+    JwtService jwtService;
+    UserMapper userMapper;
 
-    public AuthenticationResponse register(RegisterRequest request) {
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .roles(Set.of(Role.builder().roleName("USER").build()))
-                .build();
-        userRepository.save(user);
-        String jwtToken = JwtUtils.generateToken(user);
-        return AuthenticationResponse.builder().token(jwtToken).build();
+    public RegisterResponse register(RegisterRequest request) {
+        Role userRole = roleRepository.findByRoleName("USER")
+                .orElseThrow(() -> new RuntimeException("Role not found"));
+        request.setPassword(passwordEncoder.encode(request.getPassword()));
+        User user = userMapper.toUser(request);
+        user.setRoles(Set.of(userRole));
+        return userMapper.toRegisterResponse(userRepository.save(user));
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -45,7 +46,7 @@ public class AuthenticationService {
         );
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        String jwtToken = JwtUtils.generateToken(user);
+        String jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder().token(jwtToken).build();
     }
 }

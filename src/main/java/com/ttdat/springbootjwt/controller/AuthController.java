@@ -3,6 +3,7 @@ package com.ttdat.springbootjwt.controller;
 import com.ttdat.springbootjwt.dto.request.AuthenticationRequest;
 import com.ttdat.springbootjwt.dto.request.RegisterRequest;
 import com.ttdat.springbootjwt.dto.response.AuthenticationResponse;
+import com.ttdat.springbootjwt.dto.response.RegisterResponse;
 import com.ttdat.springbootjwt.service.AuthenticationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("api/v1/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
@@ -22,14 +23,14 @@ public class AuthController {
     AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> register(
+    public ResponseEntity<RegisterResponse> register(
             @RequestBody RegisterRequest registerRequest
     ) {
         return ResponseEntity.ok(authenticationService.register(registerRequest));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthenticationResponse> athenticate(
+    @PostMapping("/authenticate")
+    public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest authenticationRequest
             ) {
         return ResponseEntity.ok(authenticationService.authenticate(authenticationRequest));

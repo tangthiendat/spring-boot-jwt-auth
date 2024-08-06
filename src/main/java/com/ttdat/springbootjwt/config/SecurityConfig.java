@@ -1,7 +1,6 @@
 package com.ttdat.springbootjwt.config;
 
 import com.ttdat.springbootjwt.filter.JWTAuthenticationFilter;
-import com.ttdat.springbootjwt.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -25,23 +24,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class SecurityConfig {
 
-    UserRepository userRepository;
+    JWTAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("/api/v1/auth/**").permitAll())
+                        request.requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/demo").authenticated())
                 .sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(new JWTAuthenticationFilter(userDetailsService()), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -51,7 +46,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider(UserDetailsService userDetailsService){
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService());
+        authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
