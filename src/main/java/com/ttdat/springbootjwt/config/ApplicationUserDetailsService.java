@@ -1,4 +1,4 @@
-package com.ttdat.springbootjwt.service;
+package com.ttdat.springbootjwt.config;
 
 import com.ttdat.springbootjwt.repository.UserRepository;
 import lombok.AccessLevel;

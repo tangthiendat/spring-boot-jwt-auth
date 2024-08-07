@@ -1,5 +1,6 @@
 package com.ttdat.springbootjwt.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,5 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthenticationResponse {
-    String token;
+    @JsonProperty("access_token")
+    String accessToken;
+    @JsonProperty("refresh_token")
+    String refreshToken;
 }
