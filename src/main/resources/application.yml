@@ -11,7 +11,7 @@ spring:
 application:
   security:
     jwt:
-      secret: JOwmxZ10Mid8CDzXmelthjFvddbWKImO
+      secret: 32e83345d6965be2fcd54b563b2f2a354302a6001bcb7a1f13c014c02b927c680d326b45976b8e899bf56ab1b2f7b2cb1ede0bed251b0b17bb1be6c4fb1587cf7ede801ac083cc548ba3dc818e3ef40c9f8133969fbe66c6d471223dbf665191e56eefc8f9b4f8525526a7941db0d39695632aba1d4dfc1d315d851dca1c78af
       expiration: 30000 #1 day
       refresh-token:
         expiration: 604800000 #7 days
