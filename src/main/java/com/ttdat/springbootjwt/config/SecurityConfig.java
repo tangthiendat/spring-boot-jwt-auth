@@ -22,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RequiredArgsConstructor
 public class SecurityConfig implements WebMvcConfigurer {
   private final JWTAuthenticationFilter jwtAuthenticationFilter;
+  private final AppAuthenticationEntryPoint authenticationEntryPoint;
 
   @Bean
   public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -35,7 +36,9 @@ public class SecurityConfig implements WebMvcConfigurer {
                     .authenticated())
         .sessionManagement(
             sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(
+                exceptions -> exceptions.authenticationEntryPoint(authenticationEntryPoint));
     return http.build();
   }
 
