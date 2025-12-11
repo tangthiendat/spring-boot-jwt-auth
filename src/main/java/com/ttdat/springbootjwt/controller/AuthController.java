@@ -2,16 +2,14 @@ package com.ttdat.springbootjwt.controller;
 
 import com.ttdat.springbootjwt.dto.request.LoginRequest;
 import com.ttdat.springbootjwt.dto.request.RegisterRequest;
-import com.ttdat.springbootjwt.dto.response.BaseResponse;
 import com.ttdat.springbootjwt.dto.response.AuthResponse;
+import com.ttdat.springbootjwt.dto.response.BaseResponse;
 import com.ttdat.springbootjwt.dto.response.RegisterResponse;
 import com.ttdat.springbootjwt.service.AuthenticationService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.SneakyThrows;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -29,5 +27,11 @@ public class AuthController {
   public BaseResponse<AuthResponse> login(
       @RequestBody LoginRequest authenticationRequest, HttpServletResponse servletResponse) {
     return BaseResponse.of(authenticationService.login(authenticationRequest, servletResponse));
+  }
+
+  @PostMapping("/refresh-token")
+  @SneakyThrows
+  public BaseResponse<AuthResponse> refreshToken(@CookieValue("refreshToken") String refreshToken) {
+    return BaseResponse.of(authenticationService.refreshToken(refreshToken));
   }
 }

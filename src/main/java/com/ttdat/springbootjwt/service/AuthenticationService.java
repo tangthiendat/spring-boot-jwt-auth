@@ -6,6 +6,7 @@ import com.ttdat.springbootjwt.dto.response.AuthResponse;
 import com.ttdat.springbootjwt.dto.response.RegisterResponse;
 import com.ttdat.springbootjwt.entity.Role;
 import com.ttdat.springbootjwt.entity.User;
+import com.ttdat.springbootjwt.exception.InvalidTokenException;
 import com.ttdat.springbootjwt.mapper.UserMapper;
 import com.ttdat.springbootjwt.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
@@ -53,5 +54,19 @@ public class AuthenticationService {
     servletResponse.addCookie(refreshTokenCookie);
 
     return AuthResponse.builder().accessToken(accessToken).build();
+  }
+
+  public AuthResponse refreshToken(String refreshToken) throws InvalidTokenException {
+    if (jwtService.isTokenValid(refreshToken)) {
+      String email = jwtService.extractUsername(refreshToken);
+      User user =
+          userRepository
+              .findByEmail(email)
+              .orElseThrow(() -> new RuntimeException("User not found"));
+      String accessToken = jwtService.generateToken(user);
+      return AuthResponse.builder().accessToken(accessToken).build();
+    } else {
+      throw new InvalidTokenException();
+    }
   }
 }
