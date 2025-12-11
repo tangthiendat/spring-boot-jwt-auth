@@ -1,6 +1,8 @@
 package com.ttdat.springbootjwt.config;
 
 import com.ttdat.springbootjwt.filter.JWTAuthenticationFilter;
+import com.ttdat.springbootjwt.interceptor.RequestLoggerInterceptor;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,10 +15,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @RequiredArgsConstructor
-public class SecurityConfig {
+public class SecurityConfig implements WebMvcConfigurer {
   private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
   @Bean
@@ -44,5 +48,10 @@ public class SecurityConfig {
   public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig)
       throws Exception {
     return authConfig.getAuthenticationManager();
+  }
+
+  @Override
+  public void addInterceptors(@NonNull InterceptorRegistry registry) {
+    registry.addInterceptor(new RequestLoggerInterceptor()).addPathPatterns("/**");
   }
 }
