@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -50,10 +51,14 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
       }
+      filterChain.doFilter(request, response);
     } catch (InvalidTokenException e) {
-      throw new RuntimeException(e);
-    }
+      SecurityContextHolder.clearContext();
 
-    filterChain.doFilter(request, response);
+      // Attach root cause to request for further handling in AuthenticationEntryPoint
+      request.setAttribute("root_auth_exception", e);
+
+      throw new AuthenticationException(e.getMessage(), e) {};
+    }
   }
 }

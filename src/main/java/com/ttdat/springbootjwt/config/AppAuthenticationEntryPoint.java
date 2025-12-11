@@ -33,11 +33,19 @@ public class AppAuthenticationEntryPoint implements AuthenticationEntryPoint {
       HttpServletResponse response,
       AuthenticationException authException)
       throws IOException {
+    Throwable rootCause = (Throwable) request.getAttribute("root_auth_exception");
     String message;
     String exceptionCode;
 
     exceptionCode = MISSING_CREDENTIAL_EXCEPTION_CODE;
     message = MISSING_CREDENTIAL_EXCEPTION_MESSAGE;
+
+    if (rootCause != null) {
+      message = rootCause.getMessage();
+      if (rootCause instanceof InvalidTokenException) {
+        exceptionCode = ((InvalidTokenException) rootCause).getCode();
+      }
+    }
 
     response.setContentType(MediaType.APPLICATION_JSON_VALUE);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
