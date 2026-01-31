@@ -1,16 +1,14 @@
 package com.ttdat.springbootjwt.entity;
 
 import jakarta.persistence.*;
+import java.util.Collection;
+import java.util.Set;
+import java.util.UUID;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Builder
@@ -20,31 +18,25 @@ import java.util.UUID;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    UUID userId;
-    String firstName;
-    String lastName;
-    String email;
-    String password;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  UUID userId;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    Set<Role> roles = new HashSet<>();
+  String firstName;
+  String lastName;
+  String email;
+  String password;
 
+  @Enumerated(EnumType.STRING)
+  Role role;
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream().map(role -> new SimpleGrantedAuthority(role.getRoleName())).toList();
-    }
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return Set.of(new SimpleGrantedAuthority(role.name()));
+  }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
+  @Override
+  public String getUsername() {
+    return email;
+  }
 }

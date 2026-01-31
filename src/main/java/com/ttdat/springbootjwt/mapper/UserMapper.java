@@ -5,11 +5,10 @@ import com.ttdat.springbootjwt.dto.response.RegisterResponse;
 import com.ttdat.springbootjwt.entity.User;
 import org.mapstruct.Mapper;
 
-@Mapper(componentModel = "spring", uses = {RoleMapper.class})
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    User toUser(RegisterRequest registerRequest);
-    RegisterResponse toRegisterResponse(User user);
+  User toUser(RegisterRequest registerRequest);
 
-
+  RegisterResponse toRegisterResponse(User user);
 }
